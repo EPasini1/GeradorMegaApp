@@ -4,11 +4,13 @@ class GameResult {
   final List<int> numbers;
   final DateTime dateGenerated;
   final int numbersPerGame;
+  final String? generationStrategy; // New field to track how the game was generated
   
   GameResult({
     required this.numbers,
     required this.dateGenerated,
     this.numbersPerGame = 6,
+    this.generationStrategy,
   });
   
   // Convert to Map for JSON serialization
@@ -17,6 +19,7 @@ class GameResult {
       'numbers': numbers,
       'dateGenerated': dateGenerated.toIso8601String(),
       'numbersPerGame': numbersPerGame,
+      'generationStrategy': generationStrategy,
     };
   }
     // Create from Map for JSON deserialization
@@ -25,6 +28,7 @@ class GameResult {
       numbers: List<int>.from(map['numbers']),
       dateGenerated: DateTime.parse(map['dateGenerated']),
       numbersPerGame: map['numbersPerGame'] ?? 6,
+      generationStrategy: map['generationStrategy'],
     );
   }
   
