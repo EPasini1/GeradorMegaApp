@@ -722,8 +722,12 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: _latestGames.length,                      
+                      itemCount: _latestGames.length + 1,
                       itemBuilder: (context, gameIndex) {
+                        if (gameIndex == _latestGames.length) {
+                          return const SizedBox(height: 60);
+                        }
+
                         final game = _latestGames[gameIndex];
                         
                         return AnimatedBuilder(
