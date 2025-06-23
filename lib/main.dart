@@ -557,9 +557,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       ],
     );
   }
-  
-  Widget _buildGeneratorView() {
-    return Column(
+    Widget _buildGeneratorView() {
+    // Mostra a tela de histórico se _showHistory for true, caso contrário, mostra o gerador
+    return _showHistory ? _buildHistoryView() : Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -967,9 +967,9 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),          actions: [
+        appBar: AppBar(          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+          title: Text(widget.title),
+          actions: [
             IconButton(
               icon: const Icon(Icons.analytics),
               tooltip: 'Análise de Estratégias',
