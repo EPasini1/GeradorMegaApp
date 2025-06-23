@@ -68,18 +68,29 @@ class MegaSenaApiService {
   static Future<List<MegaSenaResult>> getLastResults({int quantity = 30}) async {
     final results = <MegaSenaResult>[];
     final latestContest = await getLatestContest();
-    
+
     if (latestContest == null) {
+      print('Error: Could not fetch the latest contest number.');
       return results;
     }
-    
+
     for (int contest = latestContest; contest > latestContest - quantity; contest--) {
-      final result = await getResult(contest);
-      if (result != null) {
-        results.add(result);
+      try {
+        final result = await getResult(contest);
+        if (result != null) {
+          results.add(result);
+        } else {
+          print('Warning: No result found for contest $contest.');
+        }
+      } catch (e) {
+        print('Error fetching contest $contest: $e');
       }
     }
-    
+
+    if (results.isEmpty) {
+      print('Warning: No results fetched for the last $quantity contests.');
+    }
+
     return results;
   }
   
