@@ -11,6 +11,8 @@ class MegaSenaResult {
     required this.date,
     required this.numbers,
   });
+
+  String get drawDate => date;
 }
 
 class MegaSenaApiService {

@@ -12,6 +12,7 @@ import 'services/strategy_analytics_service.dart';
 import 'services/mega_sena_analytics_helper.dart';
 import 'screens/results_screen.dart';
 import 'screens/strategy_analytics_screen.dart';
+import 'screens/strategy_detail_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -94,22 +95,39 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     try {
       final results = await MegaSenaApiService.getLastResults();
       if (results.isNotEmpty) {
-        final gameHistory = await GameHistoryService.loadGameHistory();
-        if (gameHistory.games.isNotEmpty) {
-          await MegaSenaAnalyticsHelper.compareAllGamesHistory(
-            generatedGames: gameHistory.games,
-            historyResultsToCheck: results.length,
-          );
-        }
-        
-        setState(() {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${results.length} resultados recentes da Mega Sena carregados com sucesso!'),
-              backgroundColor: Colors.green,
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => Scaffold(
+              appBar: AppBar(
+                title: const Text('Resultados Oficiais'),
+              ),
+              body: ListView.builder(
+                padding: const EdgeInsets.all(16.0),
+                itemCount: results.length,
+                itemBuilder: (context, index) {
+                  final result = results[index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Sorteio: ${result.drawDate}',
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 8),
+                          Text('Números: ${result.numbers.join(', ')}',
+                              style: const TextStyle(fontSize: 14)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
-          );
-        });
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -834,6 +852,45 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     );
   }
 
+  Widget _buildStrategyAnalysisInfo() {
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.analytics, color: Colors.blue.shade700),
+                const SizedBox(width: 8),
+                const Text(
+                  'Análise de Estratégias',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Explore as estratégias utilizadas para gerar números da Mega Sena. '
+              'Cada estratégia é baseada em dados históricos e padrões de sorteios anteriores.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => _showAllStrategiesInfo(context),
+              child: const Text('Ver Detalhes das Estratégias'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildConfigurationView() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
@@ -899,6 +956,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               ),
             ),
           ),
+          _buildStrategyAnalysisInfo(),
         ],
       ),
     );
@@ -911,7 +969,33 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-          title: Text(widget.title),
+          title: Text(widget.title),          actions: [
+            IconButton(
+              icon: const Icon(Icons.analytics),
+              tooltip: 'Análise de Estratégias',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const StrategyAnalyticsScreen(),
+                  ),
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.history),
+              tooltip: 'Ver Histórico',
+              onPressed: () {
+                setState(() {
+                  _showHistory = !_showHistory;
+                });
+              },
+            ),
+            IconButton(
+              icon: const Icon(Icons.update),
+              tooltip: 'Ver Resultados Oficiais',
+              onPressed: _fetchPreviousResults,
+            ),
+          ],
           bottom: TabBar(
             tabs: [
               Tab(text: 'Gerador'),
